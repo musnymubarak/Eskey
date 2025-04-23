@@ -28,6 +28,8 @@ import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.security.jwt.JwtUtils;
 import com.example.demo.security.services.UserDetailsImpl;
+import com.example.demo.payload.request.SignupRequest;
+
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -64,52 +66,52 @@ public class AuthController {
 
 	@PostMapping("/signup")
 	public ResponseEntity<?> registerUser(@RequestBody SignupRequest signUpRequest) {
-		// Check if username is already taken
-		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-			return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
-		}
+	    // Check if username is already taken
+	    if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+	        return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
+	    }
 
-		// Check if email is already taken
-		if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-			return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
-		}
+	    // Check if email is already taken
+	    if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+	        return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
+	    }
 
-		// Create new user's account
-		User user = new User(signUpRequest.getUsername(), signUpRequest.getEmail(),
-				encoder.encode(signUpRequest.getPassword()));
+	    // Create new user's account using the correct constructor
+	    User user = new User(signUpRequest.getUsername(), signUpRequest.getEmail(), 
+	            encoder.encode(signUpRequest.getPassword()));
 
-		Set<String> strRoles = signUpRequest.getRole();
-		Set<Role> roles = new HashSet<>();
+	    Set<String> strRoles = signUpRequest.getRole();
+	    Set<Role> roles = new HashSet<>();
 
-		if (strRoles == null) {
-			Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-					.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-			roles.add(userRole);
-		} else {
-			strRoles.forEach(role -> {
-				switch (role) {
-				case "admin":
-					Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
-							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-					roles.add(adminRole);
-					break;
-				case "mod":
-					Role modRole = roleRepository.findByName(ERole.ROLE_MODERATOR)
-							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-					roles.add(modRole);
-					break;
-				default:
-					Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-					roles.add(userRole);
-				}
-			});
-		}
+	    if (strRoles == null) {
+	        Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+	                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+	        roles.add(userRole);
+	    } else {
+	        strRoles.forEach(role -> {
+	            switch (role) {
+	                case "admin":
+	                    Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
+	                            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+	                    roles.add(adminRole);
+	                    break;
+	                case "mod":
+	                    Role modRole = roleRepository.findByName(ERole.ROLE_MODERATOR)
+	                            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+	                    roles.add(modRole);
+	                    break;
+	                default:
+	                    Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+	                            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+	                    roles.add(userRole);
+	            }
+	        });
+	    }
 
-		user.setRoles(roles);
-		userRepository.save(user);
+	    user.setRoles(roles);
+	    userRepository.save(user);
 
-		return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+	    return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
 	}
 
 }

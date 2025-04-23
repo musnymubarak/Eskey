@@ -16,66 +16,75 @@ import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-
 @Entity
 @Table(name = "users", uniqueConstraints = { @UniqueConstraint(columnNames = "username") })
 public class User {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	@NotBlank
-	@Size(max = 50)
-	private String username;
-	@Size(max = 100)
-	@NotBlank
-	private String password;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @NotBlank
+    @Size(max = 50)
+    private String username;
 
-	private Set<Role> roles = new HashSet<>();
-	
-	public  User(String username, String password) {
-		this.username = username;
-		this.password = password;
-		
-	}
+    @Size(max = 100)
+    @NotBlank
+    private String password;
 
-	public Long getId() {
-		return id;
-	}
+    @NotBlank
+    @Size(max = 100)
+    private String email;  // Add email field
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
 
-	public String getUsername() {
-		return username;
-	}
+    // Update constructor to include email
+    public User(String username, String email, String password) {
+        this.username = username;
+        this.email = email;  // Initialize email
+        this.password = password;
+        this.roles = new HashSet<>();
+    }
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
+    // Getters and setters
+    public Long getId() {
+        return id;
+    }
 
-	public String getPassword() {
-		return password;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public String getUsername() {
+        return username;
+    }
 
-	public Set<Role> getRoles() {
-		return roles;
-	}
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-	public void setRoles(Set<Role> roles) {
-		this.roles = roles;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public String getEmail() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
 }
