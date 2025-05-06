@@ -1,53 +1,27 @@
 package com.example.demo.model;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 
 @Entity
-@Table(name = "users", uniqueConstraints = { @UniqueConstraint(columnNames = "username") })
+@Table(name = "users")
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Size(max = 50)
     private String username;
-
-    @Size(max = 100)
-    @NotBlank
     private String password;
+    private String email;  
+    private String phoneNumber;  
 
-    @NotBlank
-    @Size(max = 100)
-    private String email;  // Add email field
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles = new HashSet<>();
-
-    // Update constructor to include email
-    public User(String username, String email, String password) {
-        this.username = username;
-        this.email = email;  // Initialize email
-        this.password = password;
-        this.roles = new HashSet<>();
+    public User() {
     }
 
-    // Getters and setters
     public Long getId() {
         return id;
     }
@@ -80,11 +54,11 @@ public class User {
         this.email = email;
     }
 
-    public Set<Role> getRoles() {
-        return roles;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }
