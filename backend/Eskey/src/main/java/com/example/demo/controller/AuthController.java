@@ -100,10 +100,12 @@ public class AuthController {
         // Load user details after successful authentication
         UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(request.getUsername());
 
-        // Generate JWT token
-        String token = jwtUtil.generateToken(userDetails.getUsername());
+        // Generate JWT token with roles/authorities
+        String token = jwtUtil.generateToken(userDetails);
 
-        // Return the generated token
-        return ResponseEntity.ok(new AuthResponse(token));
+        // Add the token to the response headers
+        return ResponseEntity.ok()
+                .header("Authorization", "Bearer " + token) 
+                .body(new AuthResponse(token)); 
     }
 }
