@@ -10,14 +10,20 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.List;
 
 @Component
 public class JwtUtil {
     private final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS512);
 
-    public String generateToken(String username) {
+    public String generateToken(UserDetails userDetails) {
+        Claims claims = Jwts.claims().setSubject(userDetails.getUsername());
+        claims.put("roles", userDetails.getAuthorities().stream()
+            .map(authority -> authority.getAuthority()) 
+            .toList());
+    
         return Jwts.builder()
-            .setSubject(username)
+            .setClaims(claims)
             .setIssuedAt(new Date())
             .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hour
             .signWith(SECRET_KEY)
@@ -40,5 +46,15 @@ public class JwtUtil {
             .parseClaimsJws(token)
             .getBody();
         return extractUsername(token).equals(userDetails.getUsername()) && !claims.getExpiration().before(new Date());
+    }
+
+    public List<String> extractRoles(String token) {
+        Claims claims = Jwts.parserBuilder()
+            .setSigningKey(SECRET_KEY)
+            .build()
+            .parseClaimsJws(token)
+            .getBody();
+    
+        return (List<String>) claims.get("roles");
     }
 }
