@@ -31,7 +31,7 @@ class AuthResponse {
     public String getToken() {
         return token;
     }
-    
+
     public void setToken(String token) {
         this.token = token;
     }
@@ -63,14 +63,29 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+        // Check if username already exists
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
             return ResponseEntity.badRequest().body("Username already exists");
         }
 
-        // Create a new user and save it in the repository
+        // Check if email already exists
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            return ResponseEntity.badRequest().body("Email already exists");
+        }
+
+        // Check if phone number already exists
+        if (userRepository.findByPhoneNumber(request.getPhoneNumber()).isPresent()) {
+            return ResponseEntity.badRequest().body("Phone number already exists");
+        }
+
+        // Create a new user and set all fields
         User user = new User();
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setEmail(request.getEmail());
+        user.setPhoneNumber(request.getPhoneNumber());
+
+        // Save the user in the repository
         userRepository.save(user);
 
         return ResponseEntity.ok("User registered successfully");
@@ -80,8 +95,7 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
             authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
-            );
+                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
