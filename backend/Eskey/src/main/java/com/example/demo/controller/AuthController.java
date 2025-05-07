@@ -20,6 +20,8 @@ import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserDetailsServiceImpl;
 import com.example.demo.util.JwtUtil;
 
+import jakarta.validation.Valid;
+
 // The response class for returning JWT
 class AuthResponse {
     private String token;
@@ -62,30 +64,25 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-        // Check if username already exists
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
             return ResponseEntity.badRequest().body("Username already exists");
         }
 
-        // Check if email already exists
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             return ResponseEntity.badRequest().body("Email already exists");
         }
 
-        // Check if phone number already exists
         if (userRepository.findByPhoneNumber(request.getPhoneNumber()).isPresent()) {
             return ResponseEntity.badRequest().body("Phone number already exists");
         }
 
-        // Create a new user and set all fields
         User user = new User();
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setEmail(request.getEmail());
         user.setPhoneNumber(request.getPhoneNumber());
 
-        // Save the user in the repository
         userRepository.save(user);
 
         return ResponseEntity.ok("User registered successfully");

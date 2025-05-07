@@ -1,12 +1,24 @@
 package com.example.demo.dto;
 
-public class RegisterRequest {
-    private String username;
-    private String password;
-    private String email;
-    private String phoneNumber; // Ensure this matches the JSON key
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
-    // Getters and setters
+public class RegisterRequest {
+    @NotBlank(message = "Username is required")
+    private String username;
+
+    @NotBlank(message = "Password is required")
+    private String password;
+
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email format")
+    private String email;
+
+    @NotBlank(message = "Phone number is required")
+    @Pattern(regexp = "^07\\d{8}$", message = "Phone number must be 10 digits and start with 07")
+    private String phoneNumber;
+
     public String getUsername() {
         return username;
     }
