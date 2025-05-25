@@ -1,19 +1,27 @@
 import { useState } from 'react';
 
-let loggedIn = false;
+const dummyUser = {
+  email: 'user@example.com',
+  password: '123456',
+};
 
 export const useAuth = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(loggedIn);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [error, setError] = useState('');
 
-  const login = () => {
-    loggedIn = true;
-    setIsAuthenticated(true);
+  const login = (email: string, password: string) => {
+    if (email === dummyUser.email && password === dummyUser.password) {
+      setIsAuthenticated(true);
+      setError('');
+    } else {
+      setIsAuthenticated(false);
+      setError('Invalid email or password');
+    }
   };
 
   const logout = () => {
-    loggedIn = false;
     setIsAuthenticated(false);
   };
 
-  return { isAuthenticated, login, logout };
+  return { isAuthenticated, login, logout, error };
 };
